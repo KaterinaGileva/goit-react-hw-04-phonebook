@@ -9,7 +9,7 @@ import ContactList from 'components/ContactList';
 
 export function App() {
   const [contacts, setContacts] = useState(() => {
-    return JSON.parse(localStorage.getItem('contacts'));
+    return JSON.parse(window.localStorage.getItem('contacts')) ?? [];
   });
   const [filter, setFilter] = useState('');
 
@@ -35,14 +35,14 @@ export function App() {
     );
   };
 
-  const changeFilter = e => {
-    setFilter(e.currentTarget.value);
+  const changeFilter = event => {
+    setFilter(event.currentTarget.value);
   };
 
   const filtredContacts = () => {
     const normalizedFilter = filter.toLowerCase();
     return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
+      contact.name.toLowerCase().includes(normalizedFilter),
     );
   };
 
@@ -53,7 +53,7 @@ export function App() {
 
       <h2 className={css.subtitle}>Contacts</h2>
       
-      <Filter filter={filter} changeFilter={changeFilter} />
+      <Filter value={filter} onChange={changeFilter} />
      
         <ContactList
           contacts={filtredContacts()}
