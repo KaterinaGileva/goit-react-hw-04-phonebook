@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-//import { nanoid } from 'nanoid';
 import { Report } from 'notiflix/build/notiflix-report-aio';
 import css from './App.module.css';
 import { ContactForm } from 'components/ContactForm/ContactForm';
 import Filter from 'components/Filter/Filter';
-import ContactList from 'components/ContactList';
-
+import { ContactList } from 'components/ContactList/ContactList';
 
 export function App() {
   const [contacts, setContacts] = useState(() => 
@@ -14,7 +12,7 @@ export function App() {
 
   const addContact = (id, name, number) => {
    
-    contacts.find(contact => contact.name.toLowerCase() === name.toLowerCase())
+    contacts.some(contact => contact.name.toLowerCase() === name.toLowerCase())
       ? Report.warning(
           `${name}`,
           'This user is already in the contact list.',
@@ -28,7 +26,8 @@ export function App() {
   };
 
   const deleteContact = contactId => {
-    setContacts(contacts.filter(contact => contact.id !== contactId)
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== contactId)
     );
   };
 
