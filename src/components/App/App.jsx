@@ -1,50 +1,46 @@
-import { useState, useEffect } from 'react';
-import { nanoid } from 'nanoid';
+import React, { useState, useEffect } from 'react';
+//import { nanoid } from 'nanoid';
 import { Report } from 'notiflix/build/notiflix-report-aio';
 import css from './App.module.css';
 import { ContactForm } from 'components/ContactForm/ContactForm';
 import Filter from 'components/Filter/Filter';
 import ContactList from 'components/ContactList';
-//import { Message } from 'components/Message/Message';
+
 
 export function App() {
-  const [contacts, setContacts] = useState(() => {
-    return JSON.parse(window.localStorage.getItem('contacts')) ?? [];
-  });
+  const [contacts, setContacts] = useState(() => 
+     JSON.parse(window.localStorage.getItem('contacts')) ?? []);
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const addContact = ({ name, number }) => {
-    const newContact = { id: nanoid(), name, number };
-
-    contacts.some(contact => contact.name === name)
+  const addContact = (id, name, number) => {
+   
+    contacts.find(contact => contact.name.toLowerCase() === name.toLowerCase())
       ? Report.warning(
           `${name}`,
           'This user is already in the contact list.',
           'OK'
         )
-      : setContacts(prevContacts => [newContact, ...prevContacts]);
+      : setContacts( state =>  [{ id, name, number }, ...state]);
+  };
+
+  const changeFilter = e => {
+    setFilter(e.currentTarget.value);
   };
 
   const deleteContact = contactId => {
-    setContacts(prevContacts =>
-      prevContacts.filter(contact => contact.id !== contactId)
+    setContacts(contacts.filter(contact => contact.id !== contactId)
     );
   };
 
-  const changeFilter = event => {
-    setFilter(event.currentTarget.value);
-  };
-
-  const filtredContacts = () => {
-    const normalizedFilter = filter.toLowerCase();
+  const getVisibleContacts = () => {
     return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter),
-    );
-  };
+    contact.name.toLowerCase().includes(filter)
+  );
+};
+
+useEffect(() => {
+  window.localStorage.setItem('contacts', JSON.stringify(contacts));
+}, [contacts]);
 
   return (
     <div className={css.container}>
@@ -55,11 +51,9 @@ export function App() {
       
       <Filter value={filter} onChange={changeFilter} />
      
-        <ContactList
-          contacts={filtredContacts()}
-          onDeleteContact={deleteContact}
-        />
-      
+      {contacts.length > 0 && (
+        <ContactList contacts={getVisibleContacts()} onDelete={deleteContact} />
+      )}
     </div>
   );
 }
